@@ -6,10 +6,11 @@ module.exports = {
     node: true,
     jest: true,
   },
-  extends: 'eslint:recommended',
+  extends: ['eslint:recommended', 'prettier'],
   parserOptions: {
     ecmaVersion: 'latest',
   },
+  plugins: ['node'],
   rules: {
     'indent': ['error', 2],
     'linebreak-style': 'off',

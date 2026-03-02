@@ -42,18 +42,30 @@ const authLimiter = rateLimit({
 app.use(globalLimiter);
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(origin => origin.trim()) || [];
+const { sendSuccess } = require('./utils/response');
+const { getLoggerStream } = require('./utils/logger');
+
+const app = express();
+
+const allowedOrigins =
+  process.env.ALLOWED_ORIGINS?.split(',').map(origin => origin.trim()) || [];
 
 app.use(express.json());
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Authorization', 'Content-Type']
-}));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Authorization', 'Content-Type'],
+  })
+);
 app.use(helmet());
-app.use(morgan('dev'));
+
+// Determine logging format based on environment
+const morganFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
+app.use(morgan(morganFormat, { stream: getLoggerStream() }));
 
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  sendSuccess(res, { status: 'ok' }, 200, 'Server is healthy');
 });
 
 // Apply stricter rate limiter to auth routes
@@ -67,5 +79,10 @@ app.post('/api/auth/login', (req, res) => {
 app.post('/api/auth/register', (req, res) => {
   res.status(200).json({ message: 'Register endpoint' });
 });
+
+module.exports = app;
+// Global error handling middleware - must be registered last
+const errorHandler = require('./middlewares/errorHandler');
+app.use(errorHandler);
 
 module.exports = app;
