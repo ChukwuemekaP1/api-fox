@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const { sendSuccess } = require('./utils/response');
+const { getLoggerStream } = require('./utils/logger');
 
 const app = express();
 
@@ -18,7 +19,10 @@ app.use(
   })
 );
 app.use(helmet());
-app.use(morgan('dev'));
+
+// Determine logging format based on environment
+const morganFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
+app.use(morgan(morganFormat, { stream: getLoggerStream() }));
 
 app.get('/api/health', (req, res) => {
   sendSuccess(res, { status: 'ok' }, 200, 'Server is healthy');
