@@ -21,7 +21,7 @@ const errorHandler = (err, req, res, _next) => {
     Object.keys(err.errors).forEach(key => {
       errors.push({
         field: key,
-        message: err.errors[key].message
+        message: err.errors[key].message,
       });
     });
   }
@@ -31,26 +31,26 @@ const errorHandler = (err, req, res, _next) => {
     message = 'Invalid input format';
     errors.push({
       field: err.path || 'unknown',
-      message: `Invalid value '${err.value}' for field '${err.path}'`
+      message: `Invalid value '${err.value}' for field '${err.path}'`,
     });
   }
   // Handle MongoDB duplicate key error (11000)
   else if (err.code === 11000) {
     statusCode = 409;
     message = 'Duplicate field value entered';
-    
+
     // Extract the field name from the error message
     const field = Object.keys(err.keyValue)[0];
     errors.push({
       field: field,
-      message: `${field} already exists`
+      message: `${field} already exists`,
     });
   }
   // Handle JSON Web Token errors
   else if (err.name === 'JsonWebTokenError') {
     statusCode = 401;
     message = 'Invalid token';
-  } 
+  }
   // Handle JWT token expiration
   else if (err.name === 'TokenExpiredError') {
     statusCode = 401;
@@ -67,7 +67,7 @@ const errorHandler = (err, req, res, _next) => {
     success: false,
     message,
     ...(errors.length > 0 && { errors }), // Only include errors array if there are errors
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }) // Include stack trace in development
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }), // Include stack trace in development
   });
 };
 

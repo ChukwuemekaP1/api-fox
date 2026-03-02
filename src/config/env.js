@@ -14,7 +14,7 @@ const requiredEnvVars = [
   'EMAIL_USER',
   'EMAIL_PASS',
   'STELLAR_HORIZON_URL',
-  'STELLAR_NETWORK'
+  'STELLAR_NETWORK',
 ];
 
 /**
