@@ -4,8 +4,11 @@
   "description": "StellarAid Backend is the server-side API powering the StellarAid crowdfunding platform — a blockchain‑enabled system built on the Stellar network to support transparent, secure, and efficient fundraising for social impact initiatives.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "build": "echo \"No build required for Node.js project\"",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js"
   },
@@ -34,6 +37,8 @@
     "@eslint/js": "^9.39.3",
     "eslint": "^9.39.3",
     "globals": "^17.4.0",
-    "nodemon": "^3.1.14"
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
   }
 }
