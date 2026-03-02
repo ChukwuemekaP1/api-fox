@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/SudiptaPaul-31/api-fox#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
