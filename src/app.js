@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const { sendSuccess } = require('./utils/response');
 
 const app = express();
 
@@ -17,7 +18,7 @@ app.use(helmet());
 app.use(morgan('dev'));
 
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  sendSuccess(res, { status: 'ok' }, 200, 'Server is healthy');
 });
 
 // Global error handling middleware - must be registered last
