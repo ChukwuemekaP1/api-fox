@@ -45,6 +45,17 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    // Hashed refresh token for session management
+    refreshTokenHash: {
+      type: String,
+      default: null,
+      select: false,
+    },
+    // Refresh token expiration date
+    refreshTokenExpiresAt: {
+      type: Date,
+      default: null,
+    },
     // KYC verification status for compliance
     kycStatus: {
       type: String,
