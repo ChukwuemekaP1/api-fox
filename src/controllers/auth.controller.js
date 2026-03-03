@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User.model');
 const { sendSuccess } = require('../utils/response');
 
@@ -56,6 +58,70 @@ const register = async (req, res, next) => {
   }
 };
 
+/**
+ * Login user and issue access + refresh tokens
+ * POST /api/auth/login
+ */
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const normalizedEmail = email.toLowerCase();
+
+    const user = await User.findOne({ email: normalizedEmail }).select('+password +refreshTokenHash');
+    if (!user || !user.isVerified) {
+      const error = new Error('Invalid credentials');
+      error.statusCode = 401;
+      error.isOperational = true;
+      return next(error);
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      const error = new Error('Invalid credentials');
+      error.statusCode = 401;
+      error.isOperational = true;
+      return next(error);
+    }
+
+    const accessTokenExpiresIn = process.env.JWT_EXPIRES_IN || '15m';
+    const refreshTokenExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+
+    const accessToken = jwt.sign(
+      { sub: user._id.toString(), email: user.email, role: user.role, type: 'access' },
+      process.env.JWT_SECRET,
+      { expiresIn: accessTokenExpiresIn }
+    );
+
+    const refreshToken = jwt.sign(
+      { sub: user._id.toString(), type: 'refresh' },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: refreshTokenExpiresIn }
+    );
+
+    const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    const decodedRefreshToken = jwt.decode(refreshToken);
+
+    user.refreshTokenHash = refreshTokenHash;
+    user.refreshTokenExpiresAt = decodedRefreshToken?.exp
+      ? new Date(decodedRefreshToken.exp * 1000)
+      : null;
+    await user.save();
+
+    return sendSuccess(
+      res,
+      {
+        accessToken,
+        refreshToken,
+      },
+      200,
+      'Login successful'
+    );
+  } catch (error) {
+    return next(error);
+  }
+};
+
 module.exports = {
   register,
+  login,
 };
