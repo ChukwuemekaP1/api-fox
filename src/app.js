@@ -44,6 +44,8 @@ app.use(globalLimiter);
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(origin => origin.trim()) || [];
 const { sendSuccess } = require('./utils/response');
 const { getLoggerStream } = require('./utils/logger');
+const authRoutes = require('./routes/auth.routes');
+const protectedRoutes = require('./routes/protected.routes');
 
 const app = express();
 
@@ -81,6 +83,12 @@ app.post('/api/auth/register', (req, res) => {
 });
 
 module.exports = app;
+// Auth routes
+app.use('/api/auth', authRoutes);
+
+// Protected routes
+app.use('/api/protected', protectedRoutes);
+
 // Global error handling middleware - must be registered last
 const errorHandler = require('./middlewares/errorHandler');
 app.use(errorHandler);

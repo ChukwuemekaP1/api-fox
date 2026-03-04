@@ -35,6 +35,38 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Email verification token
+    verificationToken: {
+      type: String,
+      default: null,
+    },
+    // Token expiration date
+    verificationTokenExpires: {
+      type: Date,
+      default: null,
+    },
+    // Hashed refresh token for session management
+    refreshTokenHash: {
+      type: String,
+      default: null,
+      select: false,
+    },
+    // Refresh token expiration date
+    refreshTokenExpiresAt: {
+      type: Date,
+      default: null,
+    },
+    // Password reset token for password recovery
+    resetPasswordToken: {
+      type: String,
+      default: null,
+      select: false,
+    },
+    // Password reset token expiration date
+    resetPasswordExpires: {
+      type: Date,
+      default: null,
+    },
     // KYC verification status for compliance
     kycStatus: {
       type: String,
